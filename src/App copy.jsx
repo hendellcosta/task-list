@@ -5,8 +5,9 @@ import { useEffect, useState } from "react";
 function App() {
   const [inputValue, setInputValue] = useState('');
   const [tarefas, setTarefas] = useState([]);
-  const [tarefasRealizadas, setTarefasRealizadas] = useState([]);
   const [dadosApresentados, setDadosApresentados] = useState(false);
+  const [tarefasRealizadas, setTarefasRealizadas] = useState([]);
+  //const [filteredTasks, setFilteredTasks] = useState([...tarefas, ...tarefasRealizadas]);
 
   const handleInput = (e) => {
     setInputValue(e.target.value);
@@ -87,14 +88,44 @@ function App() {
   }, [tarefasRealizadas, dadosApresentados]);
 
   return (
-    <div className="bg-[#7CBEF2] lg:w-[100vw] h-[100vh] flex items-center justify-center lg:px-20">
-      <div className="flex flex-col gap-8 bg-white lg:w-[600px] px-8 py-8 rounded-xl text-lg">
+    <div className="bg-[#7CBEF2] w-[100vw] h-[100vh] flex items-center justify-center px-20">
+      <div className="flex flex-col gap-8 bg-white w-[600px] px-8 py-8 rounded-xl text-lg">
         <span className="flex flex-col justify-between text-start">
           <h1 className="font-bold text-blue-600 lg:text-4xl">Criador de Tarefas</h1>
           <label className="flex flex-row items-center mt-2 border-4 border-gray-300 rounded-xl">
           <BiSearch className="text-2xl" />
-          <input type="text" placeholder="Pesquisar tarefa" className="w-full px-2 outline-none  text-base lg:text-xl" />
+          <input type="text" placeholder="Pesquisar tarefa" className="w-full px-2 outline-none  text-base lg:text-xl"
+            onChange={(e) => {
+              const query = e.target.value.toLowerCase();
+              const filteredItems = [...tarefas, ...tarefasRealizadas].filter((item) =>
+              item.text.toLowerCase().includes(query)
+              );
+            }}
+          />
           </label>
+
+          {filteredItems.length > 0 && (
+          <div className="text-black flex flex-col gap-3">
+            <h1 className="font-bold text-2xl">Resultados da pesquisa:</h1>
+            {filteredItems.map((t) => (
+              <div key={t.id} className="flex flex-row items-center justify-between">
+                <span className="pl-5">
+                  <input
+                    type="checkbox"
+                    id={`checkbox-${t.id}`}
+                    className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                    checked={false}
+                    onChange={() => handleCheckBox(t)}
+                  />
+                  <label htmlFor={`checkbox-${t.id}`} className="px-5">
+                    {t.text}
+                  </label>
+                </span>
+                <AiOutlineClose className="cursor-pointer" onClick={() => handleDelete(t)} />
+              </div>
+            ))}
+          </div>
+        )}
         </span>
 
         <div className="text-black flex flex-col gap-3">
